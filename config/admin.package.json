@@ -1,0 +1,14 @@
+{
+  "name" : "FrontEnd",
+  "package" : "front-end",
+  "modules" : [
+    "mcms.frontEnd"
+  ],
+  "files" : {
+    "js" : [
+      "front-end/js/frontEnd-compiled.js"
+    ],
+    "css" : [
+    ]
+  }
+}

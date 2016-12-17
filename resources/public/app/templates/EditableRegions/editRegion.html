@@ -1,0 +1,37 @@
+<md-dialog aria-label="Edit {{ VM.Region.label }}"  style="min-width: 500px;">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Edit {{ VM.Region.label }}</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="close()">
+                <md-icon  class="material-icons">close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <div class="md-dialog-content">
+        <form ng-submit="ItemForm.$valid && VM.save()" novalidate name="ItemForm">
+
+            <md-input-container class="md-block" flex-gt-sm>
+                <label>Title</label>
+                <input ng-model="VM.Region.label"
+                       required name="label">
+                <div ng-messages="ItemForm.label.$error">
+                    <ng-messages-include src="{{ VM.ValidationMessagesTemplate }}"></ng-messages-include>
+                </div>
+            </md-input-container>
+            <div ng-if="VM.Region.options">
+                <md-toolbar class="md-accent">
+                    <div class="md-toolbar-tools">
+                        <h3><span>Settings</span></h3>
+                    </div>
+                </md-toolbar>
+            <render-settings items="VM.Region.options" ng-model="VM.Region.settings"></render-settings>
+            </div>
+
+            <md-button type="submit" class="md-accent md-raised">
+                <md-icon class="material-icons">save</md-icon>
+                Save
+            </md-button>
+        </form>
+    </div>
+</md-dialog>

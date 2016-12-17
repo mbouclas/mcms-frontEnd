@@ -1,0 +1,18 @@
+<md-tabs md-dynamic-height md-border-bottom md-autoselect>
+    <md-tab label="{{ tab.label }}"
+            ng-repeat="tab in VM.tabs"
+           >
+        <md-content class="md-padding" flex>
+            <form name="itemForm" ng-submit="VM.save()">
+
+                <ng-include src="tab.file"></ng-include>
+
+                <md-button type="submit" class="md-accent md-raised">
+                    <md-icon class="material-icons">save</md-icon>
+                    Save
+                </md-button>
+            </form>
+        </md-content>
+    </md-tab>
+
+</md-tabs>

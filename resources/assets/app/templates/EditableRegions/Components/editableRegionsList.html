@@ -1,0 +1,29 @@
+<md-dialog aria-label="Edit {{ VM.Region.label }}" >
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Reorder items</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="close()">
+                <md-icon  class="material-icons">close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <div class="md-dialog-content">
+        <md-list sv-root sv-part="VM.Regions"
+                 sv-on-sort="VM.onSort($item, $partFrom, $partTo, $indexFrom, $indexTo)">
+            <md-list-item
+                    ng-repeat="region in VM.Regions"
+                    sv-element="opts"
+            >
+                <md-button class="md-icon-button" aria-label="Move" sv-handle>
+                    <md-icon class="material-icons">drag_handle</md-icon>
+                </md-button>
+                <div class="md-list-item-text" layout="column">
+                    <p>{{ region.label }}</p>
+                </div>
+                <md-divider ng-if="!$last"></md-divider>
+            </md-list-item>
+
+        </md-list>
+    </div>
+</md-dialog>

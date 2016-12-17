@@ -1,0 +1,1 @@
+{{ $user->firstName }} Welcome to {{ Config::get('core.siteName') }}

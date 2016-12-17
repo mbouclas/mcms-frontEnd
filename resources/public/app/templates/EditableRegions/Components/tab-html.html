@@ -1,0 +1,11 @@
+<div ng-repeat="(key, locale) in VM.Locales">
+    <md-toolbar class="md-accent">
+        <div class="md-toolbar-tools">
+            <h3><span>HTML content in {{ locale.name }}</span></h3>
+        </div>
+    </md-toolbar>
+    <md-input-container class="md-block" flex flex-gt-sm>
+        <label>Content</label>
+        <textarea ng-model="VM.HTML[key]" name="html-{{ key }}" redactor></textarea>
+    </md-input-container>
+</div>

@@ -1,0 +1,102 @@
+<md-card class="md-whitespace-4dp">
+    <md-toolbar class="md-table-toolbar md-default">
+        <div class="md-toolbar-tools">
+            <h2 class="md-title">{{ VM.Item.title }}</h2>
+        </div>
+    </md-toolbar>
+
+    <form ng-submit="ItemForm.$valid && VM.save()" novalidate name="ItemForm">
+        <md-toolbar class="md-accent">
+            <div class="md-toolbar-tools">
+                <h3><span>General info</span></h3>
+            </div>
+        </md-toolbar>
+        <md-input-container class="md-block" flex-gt-sm>
+            <label>Title</label>
+            <input ng-model="VM.Item.title" required name="title">
+            <div ng-messages="ItemForm.title.$error">
+                <ng-messages-include src="{{ VM.ValidationMessagesTemplate }}"></ng-messages-include>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block" flex-gt-sm>
+            <label>Form name</label>
+            <input ng-model="VM.Item.slug" required name="slug" ng-disabled="VM.Item.id">
+            <div ng-messages="ItemForm.slug.$error">
+                <ng-messages-include src="{{ VM.ValidationMessagesTemplate }}"></ng-messages-include>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block" flex-gt-sm>
+            <label>Provider</label>
+            <md-select aria-label=Provider" placeholder="Provider" multiple
+                       ng-change="VM.setProvider()"
+                       ng-model="VM.Item.provider" >
+                <md-option value="{{ item.varName }}" ng-repeat="item in VM.Providers">
+                    {{ item.label }}
+                    <small><em>({{ item.description }})</em></small>
+                </md-option>
+            </md-select>
+        </md-input-container>
+
+        <div ng-repeat="providerId in VM.Item.provider" ng-if="VM.ProvidersFlat[providerId].config.length > 0">
+            <md-toolbar class="md-accent">
+                <div class="md-toolbar-tools">
+                    <h3><span>Configuration for {{ VM.ProvidersFlat[providerId].label }} provider</span></h3>
+                </div>
+            </md-toolbar>
+            <render-settings
+                    items="VM.ProvidersFlat[providerId].config"
+                    ng-model="VM.Item.meta.providerConfig[providerId]"></render-settings>
+        </div>
+
+        <md-toolbar class="md-accent">
+            <div class="md-toolbar-tools">
+                <h3><span>Form details</span></h3>
+            </div>
+        </md-toolbar>
+        <div ng-repeat="(key, locale) in VM.Locales">
+            <md-input-container class="md-block" flex-gt-sm>
+                <label>Label in {{ locale.name }}</label>
+                <input ng-model="VM.Item.label[key]" required
+                       name="label-{{ key }}">
+                <div ng-messages="ItemForm['label-' + key].$error">
+                    <ng-messages-include src="{{ VM.ValidationMessagesTemplate }}"></ng-messages-include>
+                </div>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm>
+                <label>Description in {{ locale.name }}</label>
+                <textarea ng-model="VM.Item.description[key]" name="description-{{ key }}" redactor placeholder="Description"></textarea>
+            </md-input-container>
+
+            <render-settings
+                    items="VM.Template.settings"
+                    ng-model="VM.Item.settings"></render-settings>
+        </div>
+
+    <md-toolbar class="md-accent">
+        <div class="md-toolbar-tools">
+            <h3><span>Form fields</span></h3>
+        </div>
+    </md-toolbar>
+
+        <div ng-repeat="providerId in VM.Item.provider">
+        <div ng-repeat="comment in VM.ProvidersFlat[providerId].comments"
+             class="alert alert-{{ comment.type }}">
+            {{ comment.message }}
+        </div>
+        </div>
+    <settings-creator ng-model="VM.Item.fields"
+                      components="VM.Components"
+                      on-save="VM.onSave(field, allFields,  editedModel)"
+                      on-delete="VM.onDelete(field, $index, allFields)"
+    ></settings-creator>
+
+
+        <md-button type="submit" class="md-accent md-raised">
+            <md-icon class="material-icons">save</md-icon>
+            Save
+        </md-button>
+    </form>
+</md-card>

@@ -1,0 +1,1 @@
+@each('partials.menuWrapper', $HeaderMenu, 'item')

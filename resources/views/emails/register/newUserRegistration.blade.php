@@ -1,0 +1,1 @@
+User {{ $user->firstName }} is waiting for activation. You can do this in your control panel

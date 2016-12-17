@@ -1,0 +1,18 @@
+<md-card class="md-whitespace-4dp">
+    <md-toolbar class="md-table-toolbar md-default">
+        <div class="md-toolbar-tools">
+            <h2 class="md-title">{{ VM.Item.form.title }} {{ VM.Item.created_at | moment }}</h2>
+            <div flex></div>
+
+        </div>
+    </md-toolbar>
+
+    <md-content>
+        <md-list>
+            <md-list-item ng-repeat="(key, value) in VM.Item.data">
+                <p>{{ key }} : {{ value }}</p>
+            </md-list-item>
+        </md-list>
+    </md-content>
+
+</md-card>
