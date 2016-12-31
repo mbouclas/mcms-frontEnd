@@ -261,6 +261,10 @@
             }
 
             vm.Settings  = region.structuredData;
+            if (lo.isObject(vm.Region.regionSettings.itemSelector)) {
+                vm.itemSelectorOptions = angular.extend(vm.itemSelectorOptions, vm.Region.regionSettings.itemSelector);
+            }
+
             $timeout(function () {
                 setAllowed(region);
                 CurrentType = vm.tabs[0].type;
