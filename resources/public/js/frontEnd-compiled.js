@@ -261,7 +261,7 @@
             }
 
             vm.Settings  = region.structuredData;
-            if (lo.isObject(vm.Region.regionSettings.itemSelector)) {
+            if (vm.Region.regionSettings && lo.isObject(vm.Region.regionSettings.itemSelector)) {
                 vm.itemSelectorOptions = angular.extend(vm.itemSelectorOptions, vm.Region.regionSettings.itemSelector);
             }
 
@@ -913,7 +913,7 @@ require('./routes');
                 name: 'form-builder-edit'
             })
             .when('/front/formLog', {
-                templateUrl:  Config.templatesDir + 'FormBuilder/log.html',
+                templateUrl:  Config.templatesDir + 'FormBuilder/index.html',
                 controller: 'FormLogHomeController',
                 controllerAs: 'VM',
                 reloadOnSearch : false,

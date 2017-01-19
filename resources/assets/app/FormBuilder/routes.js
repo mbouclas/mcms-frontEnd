@@ -34,7 +34,7 @@
                 name: 'form-builder-edit'
             })
             .when('/front/formLog', {
-                templateUrl:  Config.templatesDir + 'FormBuilder/log.html',
+                templateUrl:  Config.templatesDir + 'FormBuilder/index.html',
                 controller: 'FormLogHomeController',
                 controllerAs: 'VM',
                 reloadOnSearch : false,

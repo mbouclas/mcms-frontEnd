@@ -104,7 +104,7 @@
             }
 
             vm.Settings  = region.structuredData;
-            if (lo.isObject(vm.Region.regionSettings.itemSelector)) {
+            if (vm.Region.regionSettings && lo.isObject(vm.Region.regionSettings.itemSelector)) {
                 vm.itemSelectorOptions = angular.extend(vm.itemSelectorOptions, vm.Region.regionSettings.itemSelector);
             }
 
