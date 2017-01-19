@@ -210,7 +210,8 @@ class EditableRegions
         }
 
         if (isset($resultSet['type']) && $resultSet['type'] == 'class'){
-            $resultSet['items'] = (\App::make($resultSet['class']))->handle($resultSet);//this is essentially assigning by reference the $this->resultSet
+            $class = \App::make($resultSet['class']);
+            $resultSet['items'] = $class->handle($resultSet);//this is essentially assigning by reference the $this->resultSet
         }
 
         //now check if we have any items to process (class based items)
