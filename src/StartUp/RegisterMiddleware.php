@@ -21,9 +21,9 @@ class RegisterMiddleware
      */
     public function handle(ServiceProvider $serviceProvider, Router $router)
     {
-        $router->middleware('auth', \Mcms\FrontEnd\Http\Middleware\Authenticate::class);
-        $router->middleware('auth.basic', \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class);
-        $router->middleware('guest', \Mcms\FrontEnd\Http\Middleware\RedirectIfAuthenticated::class);
-        $router->middleware('localize', \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class);
+        $router->aliasMiddleware('auth', \Mcms\FrontEnd\Http\Middleware\Authenticate::class);
+        $router->aliasMiddleware('auth.basic', \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class);
+        $router->aliasMiddleware('guest', \Mcms\FrontEnd\Http\Middleware\RedirectIfAuthenticated::class);
+        $router->aliasMiddleware('localize', \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class);
     }
 }
