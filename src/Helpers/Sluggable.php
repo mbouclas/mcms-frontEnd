@@ -61,6 +61,6 @@ trait Sluggable
     {
         $this->setRoute();
         $routes = Route::getRoutes();
-        return $routes->getByName($this->route)->getPath();
+        return $routes->getByName($this->route)->uri();
     }
 }
