@@ -913,7 +913,7 @@ require('./routes');
                 name: 'form-builder-edit'
             })
             .when('/front/formLog', {
-                templateUrl:  Config.templatesDir + 'FormBuilder/index.html',
+                templateUrl:  Config.templatesDir + 'FormBuilder/formLog.html',
                 controller: 'FormLogHomeController',
                 controllerAs: 'VM',
                 reloadOnSearch : false,
