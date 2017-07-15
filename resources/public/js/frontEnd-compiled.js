@@ -495,7 +495,7 @@ require('./routes');
         vm.Providers = FormBuilderService.providers();
         vm.ProvidersFlat = FormBuilderService.providersFlat();
         vm.Template = FormBuilderService.getTemplate();
-console.log(vm.Template.settings)
+
         //when setting providers, we need to sync it with the meta
         vm.setProvider = function () {
             FormBuilderService.syncProviderWithMeta(vm.Item);
@@ -1558,7 +1558,7 @@ require('./editPage.component');
                         return;
                     }
 
-                    destinationModel[field.varName] = sourceModel[field.prefill][lang].replace(/(<([^>]+)>)/ig,"");
+                    destinationModel[field.varName] = (!sourceModel[field.prefill][lang]) ? '' : sourceModel[field.prefill][lang].replace(/(<([^>]+)>)/ig,"");
                 }
             });
 

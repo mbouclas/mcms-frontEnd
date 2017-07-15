@@ -31,7 +31,7 @@
                         return;
                     }
 
-                    destinationModel[field.varName] = sourceModel[field.prefill][lang].replace(/(<([^>]+)>)/ig,"");
+                    destinationModel[field.varName] = (!sourceModel[field.prefill][lang]) ? '' : sourceModel[field.prefill][lang].replace(/(<([^>]+)>)/ig,"");
                 }
             });
 
