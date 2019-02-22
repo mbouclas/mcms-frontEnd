@@ -15,6 +15,8 @@ class UserRegistration
 
         $class = Config::get('frontEnd.user.register.before');
 
+        if (!$class) { return false;}
+
         try {
             return (new $class())->handle($user);
         } catch (\Exception $e){
@@ -29,6 +31,8 @@ class UserRegistration
         }
 
         $class = Config::get('frontEnd.user.register.after');
+
+        if (!$class) { return false;}
 
         try {
             return (new $class())->handle($user);
