@@ -38,9 +38,14 @@ trait Sluggable
 
         $routes = Route::getRoutes();
         $params = [];
+        if (is_null($routes->getByName($this->route))) {
+            return null;
+        }
+
         foreach ($routes->getByName($this->route)->parameterNames() as $parameterName) {
             $params[$parameterName] = $this->{$parameterName};
         }
+
         return route($this->route, $params);
     }
 
