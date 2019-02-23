@@ -2,6 +2,7 @@
 
 namespace Mcms\FrontEnd\UserRegistration;
 
+use Carbon\Carbon;
 use Mcms\Core\Models\User;
 
 
@@ -39,6 +40,7 @@ class VerifiedAfter
         $user->active = true;
         $user->awaits_moderation = false;
         $user->confirmation_code = null;
+        $user->activated_at = Carbon::now();
         $user->save();
 
         //mail user if welcome is set
