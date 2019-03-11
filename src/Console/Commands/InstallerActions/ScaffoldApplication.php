@@ -37,21 +37,7 @@ class ScaffoldApplication
         $config->addToArray('providers', '\FrontEnd\CustomServiceProvider::class', true)->save();
         $config = new ConfigFiles('app', true);
         $config->addToArray('providers', '\FrontEnd\Providers\ViewComposerServiceProvider::class', true)->save();
-/*        $config->contents['providers'][] = \FrontEnd\CustomServiceProvider::class;
-        $config->contents['providers'][] = \FrontEnd\Providers\ViewComposerServiceProvider::class;
-        $config->save();*/
-/*
-        $appConfigLine = 'Mcms\Core\CoreServiceProvider::class,
 
-        FrontEnd\\CustomServiceProvider::class,';//app.php lookup line*/
-/*        $requirement = '"psr-4": {
-            "FrontEnd\\\\": "FrontEnd/",';//composer lookup line*/
-
-        //Add it to the service providers
-/*        $fs->replaceAndSave(base_path('config/app.php'),
-            'Mcms\Core\CoreServiceProvider::class,
-            FrontEnd\Providers\ViewComposerServiceProvider::class,',
-            $appConfigLine);*/
 
         //Add it to composer.json
         $composer = new Composer();
@@ -84,10 +70,8 @@ class ScaffoldApplication
                             APP_DEBUGBAR=true';
 
         $fs->replaceAndSave(base_path('.env'), $debugBarLookUp, $debugBarReplace);
-        // run artisan optimize
-        $command->call('optimize', []);
 
-        //Run composer dump-autoload
+
         $command->comment('Application scaffold complete');
     }
 }
