@@ -74,7 +74,7 @@ class FormBuilderService
         }
 
         $Item->update($item);
-        Event::fire('form.updated',$Item);
+        event('form.updated',$Item);
         \Artisan::call('view:clear');
         return $Item;
     }
@@ -92,7 +92,7 @@ class FormBuilderService
         }
         $item['slug'] = camel_case($item['slug']);//in case the user fucked up
         $Item = $this->model->create($item);
-        Event::fire('form.created',$Item);
+        event('form.created',$Item);
 
         return $Item;
     }
@@ -104,7 +104,7 @@ class FormBuilderService
     public function destroy($id)
     {
         $Item = $this->model->find($id);
-        Event::fire('form.deleted',$Item);
+        event('form.deleted',$Item);
 
         return $Item->delete();
     }

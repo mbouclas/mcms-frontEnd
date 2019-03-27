@@ -40,7 +40,7 @@ class FormLogService
         $Item = $this->model->find($id);
 
         $Item->update($item);
-        Event::fire('formLog.updated',$Item);
+        event('formLog.updated',$Item);
 
         return $Item;
     }
@@ -52,7 +52,7 @@ class FormLogService
     public function store(array $item)
     {
         $Item = $this->model->create($item);
-        Event::fire('formLog.created',$Item);
+        event('formLog.created',$Item);
 
         return $Item;
     }
@@ -64,7 +64,7 @@ class FormLogService
     public function destroy($id)
     {
         $Item = $this->model->find($id);
-        Event::fire('form.deleted',$Item);
+        event('form.deleted',$Item);
 
         return $Item->delete();
     }
