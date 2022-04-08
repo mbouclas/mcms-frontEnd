@@ -6,13 +6,15 @@ namespace Mcms\FrontEnd\Installer\AfterUpdate;
 use Mcms\Core\Models\UpdatesLog;
 use Mcms\FrontEnd\Installer\AfterUpdate\CreateMissingTable\CreateFormBuilderTables;
 use Illuminate\Console\Command;
+use Mcms\FrontEnd\Installer\AfterUpdate\CreateMissingTable\CreateSsgHistoryTable;
 
 class CreateMissingTable
 {
     public function handle(Command $command, UpdatesLog $item)
     {
         $classes = [
-            CreateFormBuilderTables::class
+            CreateFormBuilderTables::class,
+            CreateSsgHistoryTable::class,
         ];
 
         foreach ($classes as $class) {
