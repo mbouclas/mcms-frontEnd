@@ -115,8 +115,6 @@
 
     function Controller(Regions) {
         var vm = this;
-
-
         vm.Regions = Regions;
 
     }
@@ -383,6 +381,7 @@ require('./EditableRegionsHomeController');
 require('./EditableRegionController');
 require('./editableRegion.component');
 require('./routes');
+
 },{"./EditableRegionController":1,"./EditableRegionsHomeController":2,"./dataService":3,"./editableRegion.component":4,"./routes":6,"./service":7}],6:[function(require,module,exports){
 (function() {
     'use strict';
@@ -1626,6 +1625,204 @@ require('./editPage.component');
 (function () {
     'use strict';
 
+    angular.module('mcms.frontEnd.ssg')
+        .service('SsgDataService',Service);
+
+    Service.$inject = ['$http', '$q'];
+
+    function Service($http, $q) {
+        const _this = this;
+        var baseUrl = '/admin/api/ssg/';
+
+        this.index = index;
+        this.update = update;
+
+        this.startBuild = () => {
+            return $http.post(`${baseUrl}start-build`).then(res => res.data);
+        }
+
+
+        function index(filters) {
+            return $http.get(baseUrl, {params : filters}).then(res => res.data);
+        }
+
+        function update(id, item) {
+            return $http.put(baseUrl + id, item)
+                .then(returnData);
+        }
+
+        function returnData(response) {
+            return response.data;
+        }
+    }
+})();
+
+},{}],34:[function(require,module,exports){
+(function(){
+    'use strict';
+
+    angular.module('mcms.frontEnd.ssg', [])
+        .run(run);
+
+    run.$inject = ['mcms.menuService'];
+
+    function run(Menu) {
+
+    }
+})();
+require('./dataService');
+require('./service');
+require('./ssgHomeController');
+require('./routes');
+
+},{"./dataService":33,"./routes":35,"./service":36,"./ssgHomeController":37}],35:[function(require,module,exports){
+(function() {
+    'use strict';
+
+    angular.module('mcms.frontEnd.ssg')
+        .config(config);
+
+    config.$inject = ['$routeProvider','FRONTEND_CONFIG'];
+
+    function config($routeProvider,Config) {
+        $routeProvider
+            .when('/front/ssg', {
+                templateUrl:  Config.templatesDir + 'Ssg/index.html',
+                controller: 'SsgHomeController',
+                controllerAs: 'VM',
+                reloadOnSearch : false,
+                resolve: {
+                    Init : ["AuthService", '$q', 'SsgService', function (ACL, $q, SSGS) {
+                        return (!ACL.inGates('editableRegions.menu')) ? $q.reject(403) : SSGS.init();
+                    }]
+                },
+                name: 'ssg-home'
+            });
+    }
+
+
+})();
+
+},{}],36:[function(require,module,exports){
+(function () {
+    'use strict';
+
+
+    angular.module('mcms.frontEnd.ssg')
+        .service('SsgService',Service);
+
+    Service.$inject = ['lodashFactory', 'LangService', 'SsgDataService', '$rootScope'];
+
+    function Service(lo, Lang, DS, $rootScope) {
+
+        const _this = this;
+        this.records = [];
+        this.init = init;
+
+        this.all = () => {
+           return DS.index()
+                .then(items => {
+                    this.records = items;
+
+                    return items;
+                });
+        }
+
+        this.startBuild = () => {
+            const source = new EventSource("/admin/api/ssg/notifications");
+            const eventListener  = (event) => {
+                let data = JSON.parse(event.data);
+                if (data.state && data.state === 'completed') {
+                    $rootScope.$broadcast('buildCompleted', data);
+                    source.close();
+                }
+
+                if (data.state && data.state === 'failed') {
+                    $rootScope.$broadcast('buildFailed', data);
+                    source.close();
+                }
+
+                if (data.state && data.state === 'progress') {
+                    $rootScope.$broadcast('buildProgress', data);
+                }
+            };
+
+            source.addEventListener('message', eventListener, false);
+
+            return DS.startBuild();
+        };
+
+        function init() {
+
+            return _this.all();
+        }
+    }
+})();
+
+},{}],37:[function(require,module,exports){
+(function() {
+    'use strict';
+
+    angular.module('mcms.frontEnd.ssg')
+        .controller('SsgHomeController',Controller);
+
+    Controller.$inject = ['Init', 'SsgService', '$rootScope', '$scope'];
+
+    function Controller(InitialLoad, service, $rootScope, $scope) {
+        this.building = false;
+        this.buildComplete = false;
+        this.buildFailed = false;
+        this.buildProgress = false;
+        this.currentBuild;
+        this.items = InitialLoad;
+        this.progressOutput = '';
+        // Once the build is complete, refresh the data
+        $rootScope.$on('buildCompleted', ($event, data) => {
+            service.all()
+                .then(items => {
+                    this.items = items;
+                    this.building = false;
+                    this.buildComplete = true;
+
+                    setTimeout(() => {
+                        this.buildComplete = false;
+                        $scope.$apply();
+                    }, 5000);
+                });
+        });
+
+        $rootScope.$on('buildFailed', ($event, data) => {
+            this.buildFailed = true;
+            setTimeout(() => {
+                this.buildFailed = false;
+                $scope.$apply();
+            }, 5000);
+        });
+
+        $rootScope.$on('buildProgress', ($event, data) => {
+
+        });
+
+        this.build = () => {
+            this.building = true;
+            service.startBuild()
+                .then(res => {
+                    this.currentBuild = res;
+                    console.log(this.currentBuild)
+                    return res;
+                })
+                .then(() => service.all())
+                .then(items => this.items = items)
+                .catch(e => console.log(e));
+        }
+    }
+
+})();
+
+},{}],38:[function(require,module,exports){
+(function () {
+    'use strict';
+
     angular.module('mcms.frontEnd.widgets')
         .service('WelcomeWidgetDataService',Service);
 
@@ -1653,7 +1850,7 @@ require('./editPage.component');
     }
 })();
 
-},{}],34:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function(){
     'use strict';
 
@@ -1677,7 +1874,7 @@ require('./editPage.component');
 require('./welcome.widget');
 require('./dataService');
 require('./service');
-},{"./dataService":33,"./service":35,"./welcome.widget":36}],35:[function(require,module,exports){
+},{"./dataService":38,"./service":40,"./welcome.widget":41}],40:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -1710,7 +1907,7 @@ require('./service');
     }
 })();
 
-},{}],36:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function(){
     'use strict';
 
@@ -1791,7 +1988,7 @@ require('./service');
         };
     }
 })();
-},{}],37:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function(){
     'use strict';
     var assetsUrl = '/assets/',
@@ -1831,7 +2028,7 @@ require('./service');
     angular.module('mcms.core')
         .constant('FRONTEND_CONFIG',config);
 })();
-},{}],38:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 (function () {
     'use strict';
 
@@ -1844,6 +2041,7 @@ require('./service');
         'mcms.frontEnd.permalinkArchive',
         'mcms.frontEnd.widgets',
         'mcms.frontEnd.formBuilder',
+        'mcms.frontEnd.ssg',
         'mcms.mediaFiles',
         'ngFileUpload'
     ])
@@ -1903,7 +2101,15 @@ require('./service');
                 gate : 'website.formLog.menu',
                 icon: 'history',
                 order: 6
-            })
+            }),
+            Menu.newItem({
+                id: 'ssg',
+                title: 'SSG',
+                permalink: '/front/ssg',
+                gate : 'website.formLog.menu',
+                icon: 'cloud_upload',
+                order: 7
+            }),
         ]);
     }
 
@@ -1918,5 +2124,6 @@ require('./LayoutManager');
 require('./PermalinkArchive');
 require('./Widgets');
 require('./FormBuilder');
+require('./Ssg');
 
-},{"./EditableRegions":5,"./FormBuilder":15,"./FrontPage":20,"./LayoutManager":23,"./PermalinkArchive":27,"./Seo":30,"./Settings":32,"./Widgets":34,"./config":37}]},{},[38])
+},{"./EditableRegions":5,"./FormBuilder":15,"./FrontPage":20,"./LayoutManager":23,"./PermalinkArchive":27,"./Seo":30,"./Settings":32,"./Ssg":34,"./Widgets":39,"./config":42}]},{},[43])

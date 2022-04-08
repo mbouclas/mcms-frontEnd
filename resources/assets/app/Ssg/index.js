@@ -1,7 +1,7 @@
 (function(){
     'use strict';
 
-    angular.module('mcms.frontEnd.editableRegions', [])
+    angular.module('mcms.frontEnd.ssg', [])
         .run(run);
 
     run.$inject = ['mcms.menuService'];
@@ -12,7 +12,5 @@
 })();
 require('./dataService');
 require('./service');
-require('./EditableRegionsHomeController');
-require('./EditableRegionController');
-require('./editableRegion.component');
+require('./ssgHomeController');
 require('./routes');

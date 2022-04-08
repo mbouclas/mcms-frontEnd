@@ -1,0 +1,51 @@
+<md-card class="md-whitespace-4dp">
+    <md-toolbar class="md-table-toolbar md-default">
+        <div class="md-toolbar-tools">
+            <h2 class="md-title">Static Site Generator</h2>
+            <div flex=""></div>
+
+            <md-button class="md-fab md-hue-2 md-accent" aria-label="Add"
+                       ng-click="VM.build()">
+                <md-icon class="material-icons">build</md-icon>
+                <md-tooltip md-direction="top">
+                    Build
+                </md-tooltip>
+            </md-button>
+        </div>
+
+    </md-toolbar>
+
+    <div ng-if="VM.building" class="alert alert-info">Build
+        <strong>#{{VM.currentBuild.id}}</strong>
+        started</div>
+
+    <div ng-if="VM.buildComplete" class="alert alert-success">
+        Build
+        <strong>#{{VM.currentBuild.id}}</strong>
+        completed
+    </div>
+
+    <div ng-if="VM.buildFailed" class="alert alert-danger">
+        Build
+        <strong>#{{VM.currentBuild.id}}</strong>
+        failed
+    </div>
+    <md-toolbar>
+        <h2 class="md-title">Showing {{VM.items.length}} builds</h2>
+
+    </md-toolbar>
+    <md-list flex>
+        <md-list-item ng-repeat="item in VM.items" ng-click="VM.viewItem(item.id)" class="md-3-line">
+            <div class="md-list-item-text" layout="column">
+                <h3><strong>#{{ item.id }}</strong></h3>
+                <h4>
+                    <label class="label label-success" ng-if="item.status == 'completed'">Completed</label>
+                    <label class="label label-info" ng-if="item.status == 'started'">Started</label>
+                    <label class="label label-error" ng-if="item.status == 'failed'">Failed</label>
+              </h4>
+                <p>{{ item.run_at | moment }}</p>
+            </div>
+            <md-divider ng-if="!$last"></md-divider>
+        </md-list-item>
+    </md-list>
+</md-card>

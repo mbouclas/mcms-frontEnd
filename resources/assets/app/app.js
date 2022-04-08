@@ -10,6 +10,7 @@
         'mcms.frontEnd.permalinkArchive',
         'mcms.frontEnd.widgets',
         'mcms.frontEnd.formBuilder',
+        'mcms.frontEnd.ssg',
         'mcms.mediaFiles',
         'ngFileUpload'
     ])
@@ -69,7 +70,15 @@
                 gate : 'website.formLog.menu',
                 icon: 'history',
                 order: 6
-            })
+            }),
+            Menu.newItem({
+                id: 'ssg',
+                title: 'SSG',
+                permalink: '/front/ssg',
+                gate : 'website.formLog.menu',
+                icon: 'cloud_upload',
+                order: 7
+            }),
         ]);
     }
 
@@ -84,3 +93,4 @@ require('./LayoutManager');
 require('./PermalinkArchive');
 require('./Widgets');
 require('./FormBuilder');
+require('./Ssg');

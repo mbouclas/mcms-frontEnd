@@ -8,8 +8,6 @@
 
     function Controller(Regions) {
         var vm = this;
-
-
         vm.Regions = Regions;
 
     }

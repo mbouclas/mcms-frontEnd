@@ -4,6 +4,7 @@ module.exports = (function (gulp,config,$) {
     return function (){
 
         $.log('Copying templates to production');
+
         return gulp
             .watch([
                 config.templatesDir,

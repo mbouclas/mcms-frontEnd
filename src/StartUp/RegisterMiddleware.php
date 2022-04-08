@@ -25,5 +25,6 @@ class RegisterMiddleware
         $router->aliasMiddleware('auth.basic', \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class);
         $router->aliasMiddleware('guest', \Mcms\FrontEnd\Http\Middleware\RedirectIfAuthenticated::class);
         $router->aliasMiddleware('localize', \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class);
+        $router->aliasMiddleware('sse', \Mcms\FrontEnd\Http\Middleware\SSE::class);
     }
 }

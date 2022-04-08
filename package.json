@@ -10,9 +10,9 @@
     "watch-app": "watchify ./resources/assets/app/app.js -o ./resources/public/js/admin.app.js -v",
     "minify-app": "uglifyjs ./resources/public/js/admin.app.js --compress --mangle -o ./resources/public/js/admin.app.min.js",
     "minify-components": "uglifyjs ./resources/public/js/admin.components.js --compress --mangle -o ./resources/public/js/admin.components.min.js",
-    "watch-dev-templates": "gulp watch-templates --installationDir=\"../../cms-framework\"",
-    "watch-dev-components": "watchify ./resources/assets/app/index.js -o ../cms-framework/public/front-end/js/front-end.components.js -v",
-    "watch-dev": "watchify -t browserify-ngannotate ./resources/assets/app/app.js -o ../cms-framework/public/front-end/js/frontEnd-compiled.js -v",
+    "watch-dev-templates": "gulp watch-templates --installationDir=\"../../../cms-framework\"",
+    "watch-dev-components": "watchify ./resources/assets/app/index.js -o ../../cms-framework/public/front-end/js/front-end.components.js -v",
+    "watch-dev": "watchify -t browserify-ngannotate ./resources/assets/app/app.js -o ../../cms-framework/public/front-end/js/frontEnd-compiled.js -v",
     "dev": "concurrently \"npm run watch-dev\" \"npm run watch-dev-templates\"",
     "publish": "gulp publish"
   },

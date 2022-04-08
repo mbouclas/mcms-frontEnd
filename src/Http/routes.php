@@ -1,5 +1,13 @@
 <?php
-Route::group(['prefix' => 'admin/api'], function () {
+Route::group(['prefix'=> 'webhooks'], function($router) {
+    $router->post('ssg/build/success' ,'Mcms\FrontEnd\Http\Controllers\SsgController@onBuildSuccess');
+    $router->post('ssg/build/fail' ,'Mcms\FrontEnd\Http\Controllers\SsgController@onBuildFailed');
+    $router->post('ssg/build/progress' ,'Mcms\FrontEnd\Http\Controllers\SsgController@onBuildProgress');
+});
+
+Route::group(['prefix' => 'admin/api'], function ($router) {
+    $router->get('ssg/notifications' ,'Mcms\FrontEnd\Http\Controllers\SsgController@getDataStream')->name('__sse_stream__');
+
     Route::group(['middleware' =>['level:3']], function($router)
     {
         $router->get('editableRegions' ,'Mcms\FrontEnd\Http\Controllers\EditableRegionsController@index');
@@ -11,6 +19,11 @@ Route::group(['prefix' => 'admin/api'], function () {
         $router->get('formBuilder/providers' ,'Mcms\FrontEnd\Http\Controllers\Admin\FormBuilderController@providers');
         $router->resource('formBuilder' ,'Mcms\FrontEnd\Http\Controllers\Admin\FormBuilderController');
         $router->resource('formLog' ,'Mcms\FrontEnd\Http\Controllers\Admin\FormLogController');
+        $router->resource('ssg' ,'Mcms\FrontEnd\Http\Controllers\SsgController');
+        $router->post('ssg/start-build' ,'Mcms\FrontEnd\Http\Controllers\SsgController@startBuild');
+
+
+
     });
 
 });

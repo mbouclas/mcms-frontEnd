@@ -1,8 +1,7 @@
 var path = require('path');
 var args = require('yargs').argv;
-var BaseDir = path.join(__dirname,'../'),
-    InstallationDir = path.join(__dirname,args.installationDir || '../../');
-
+var BaseDir = path.resolve(__dirname,'../'),
+    InstallationDir = path.resolve(__dirname,args.installationDir || '../../');
 
 var Config = {
     BaseDir : BaseDir,
