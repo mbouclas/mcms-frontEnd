@@ -1646,6 +1646,14 @@ require('./editPage.component');
             return $http.get(baseUrl, {params : filters}).then(res => res.data);
         }
 
+        this.init = () => {
+            return $http.get(`${baseUrl}boot`).then(res => res.data);
+        }
+
+        this.getDeployment = (id) => {
+            return $http.get(`${baseUrl}deployment/${id}`).then(res => res.data);
+        }
+
         function update(id, item) {
             return $http.put(baseUrl + id, item)
                 .then(returnData);
@@ -1714,10 +1722,17 @@ require('./routes');
     Service.$inject = ['lodashFactory', 'LangService', 'SsgDataService', '$rootScope'];
 
     function Service(lo, Lang, DS, $rootScope) {
-
+        this.provider;
         const _this = this;
         this.records = [];
         this.init = init;
+
+        this.setProvider = (provider) => {
+            this.provider = provider;
+            return this;
+        }
+
+        this.getProvider = () => {return this.provider;}
 
         this.all = () => {
            return DS.index()
@@ -1729,9 +1744,22 @@ require('./routes');
         }
 
         this.startBuild = () => {
-            const source = new EventSource("/admin/api/ssg/notifications");
+            return DS.startBuild()
+                .then(res => {
+                    // Start the SSE with the id returned.
+                    // Show a loading icon on the new entry on the build list
+                    this.startSSE(res.id);
+                    return res;
+                });
+        };
+
+        this.startSSE = (id) => {
+            const source = new EventSource(`/admin/api/ssg/notifications/${id}`);
             const eventListener  = (event) => {
                 let data = JSON.parse(event.data);
+
+                // When latest stage === deploy, stop execution
+
                 if (data.state && data.state === 'completed') {
                     $rootScope.$broadcast('buildCompleted', data);
                     source.close();
@@ -1748,13 +1776,24 @@ require('./routes');
             };
 
             source.addEventListener('message', eventListener, false);
+        }
 
-            return DS.startBuild();
-        };
+        this.deployment = (id) => {
+            return DS.getDeployment(id);
+        }
 
         function init() {
+            return Promise.all([
+                DS.init(),
+                this.all(),
+            ]).then(res => {
+                this.setProvider(res[0].provider);
 
-            return _this.all();
+                return {
+                    config: res[0],
+                    items: res[1],
+                }
+            })
         }
     }
 })();
@@ -1774,8 +1813,80 @@ require('./routes');
         this.buildFailed = false;
         this.buildProgress = false;
         this.currentBuild;
-        this.items = InitialLoad;
+        this.config = InitialLoad.config;
+        this.items = InitialLoad.items;
+        this.progress = '';
         this.progressOutput = '';
+        this.buildIterations = 0;
+        this.buildStages = [
+            {
+                "name": "queued",
+                "started_on": "2022-04-10T11:51:38.194997Z",
+                "ended_on": "2022-04-10T11:51:38.167473Z",
+                "status": "success"
+            },
+            {
+                "name": "initialize",
+                "started_on": "2022-04-10T11:51:38.167473Z",
+                "ended_on": "2022-04-10T11:51:40.344092Z",
+                "status": "success"
+            },
+            {
+                "name": "clone_repo",
+                "started_on": "2022-04-10T11:51:40.344092Z",
+                "ended_on": "2022-04-10T11:51:42.041839Z",
+                "status": "success"
+            },
+            {
+                "name": "build",
+                "started_on": "2022-04-10T11:51:42.041839Z",
+                "ended_on": null,
+                "status": "active"
+            },
+            {
+                "name": "deploy",
+                "started_on": null,
+                "ended_on": null,
+                "status": "idle"
+            }
+        ]
+
+        this.formatBuildProgress = (stages) => {
+            return stages
+                .filter(stage => stage.status !== 'idle')
+                .map(stage => {
+                    let buildingDots = '';
+                    if (stage.name === 'build' && stage.status === 'active') {
+                        this.buildIterations++;
+                        for (let i =0; this.buildIterations > i; i++) {
+                            buildingDots += '.';
+                        }
+                    }
+                    else if (stage.name === 'build' && stage.status === 'success') {
+                        this.buildIterations = 0;
+                    }
+
+                    let ret = '';
+                    const statusStr = (stage.status !== 'idle') ? ` [${stage.status}]` : '';
+
+
+                    switch (stage.name) {
+                        case 'queued': ret =  `Queued ${statusStr}`;
+                        break;
+                        case 'initialize': ret =  `Initializing ${statusStr}`;
+                        break;
+                        case 'clone_repo': ret =  `Cloning Repo ${statusStr}`;
+                        break;
+                        case 'build': ret =  `Building ${buildingDots} ${statusStr}`;
+                        break;
+                        case 'deploy': ret =  `Uploading to server ${statusStr}`;
+                        break;
+                    }
+
+                    return ret;
+                }).join('\n');
+        }
+
         // Once the build is complete, refresh the data
         $rootScope.$on('buildCompleted', ($event, data) => {
             service.all()
@@ -1783,16 +1894,21 @@ require('./routes');
                     this.items = items;
                     this.building = false;
                     this.buildComplete = true;
-
+                    this.getItems();
+                    $scope.$apply();
                     setTimeout(() => {
                         this.buildComplete = false;
-                        $scope.$apply();
+
                     }, 5000);
                 });
         });
 
         $rootScope.$on('buildFailed', ($event, data) => {
             this.buildFailed = true;
+            this.building = false;
+            $scope.$apply();
+            this.getItems();
+
             setTimeout(() => {
                 this.buildFailed = false;
                 $scope.$apply();
@@ -1800,15 +1916,35 @@ require('./routes');
         });
 
         $rootScope.$on('buildProgress', ($event, data) => {
-
+            this.progressOutput = this.formatBuildProgress(data.stages);
+            $scope.$apply();
         });
+
+        $rootScope.$on('buildStarted', ($event, data) => {
+            this.getItems()
+                .then(items => {
+                    $scope.$apply();
+                });
+        });
+
+        this.getItems = () => {
+            return service.all()
+                .then(items => {
+                    this.items = items;
+                });
+        }
+
+        this.viewItem = (id) => {
+            const item = service.deployment(id);
+            console.log(item);
+        }
 
         this.build = () => {
             this.building = true;
+
             service.startBuild()
                 .then(res => {
                     this.currentBuild = res;
-                    console.log(this.currentBuild)
                     return res;
                 })
                 .then(() => service.all())

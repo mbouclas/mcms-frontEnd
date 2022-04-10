@@ -22,6 +22,14 @@
             return $http.get(baseUrl, {params : filters}).then(res => res.data);
         }
 
+        this.init = () => {
+            return $http.get(`${baseUrl}boot`).then(res => res.data);
+        }
+
+        this.getDeployment = (id) => {
+            return $http.get(`${baseUrl}deployment/${id}`).then(res => res.data);
+        }
+
         function update(id, item) {
             return $http.put(baseUrl + id, item)
                 .then(returnData);

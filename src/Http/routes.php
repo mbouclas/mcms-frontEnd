@@ -1,4 +1,5 @@
 <?php
+
 Route::group(['prefix'=> 'webhooks'], function($router) {
     $router->post('ssg/build/success' ,'Mcms\FrontEnd\Http\Controllers\SsgController@onBuildSuccess');
     $router->post('ssg/build/fail' ,'Mcms\FrontEnd\Http\Controllers\SsgController@onBuildFailed');
@@ -6,7 +7,7 @@ Route::group(['prefix'=> 'webhooks'], function($router) {
 });
 
 Route::group(['prefix' => 'admin/api'], function ($router) {
-    $router->get('ssg/notifications' ,'Mcms\FrontEnd\Http\Controllers\SsgController@getDataStream')->name('__sse_stream__');
+    $router->get('ssg/notifications/{id}' ,'Mcms\FrontEnd\Http\Controllers\SsgController@getDataStream')->name('__sse_stream__');
 
     Route::group(['middleware' =>['level:3']], function($router)
     {
@@ -19,6 +20,8 @@ Route::group(['prefix' => 'admin/api'], function ($router) {
         $router->get('formBuilder/providers' ,'Mcms\FrontEnd\Http\Controllers\Admin\FormBuilderController@providers');
         $router->resource('formBuilder' ,'Mcms\FrontEnd\Http\Controllers\Admin\FormBuilderController');
         $router->resource('formLog' ,'Mcms\FrontEnd\Http\Controllers\Admin\FormLogController');
+        $router->get('ssg/boot' ,'Mcms\FrontEnd\Http\Controllers\SsgController@boot');
+        $router->get('ssg/deployment/{id}' ,'Mcms\FrontEnd\Http\Controllers\SsgController@getDeployment');
         $router->resource('ssg' ,'Mcms\FrontEnd\Http\Controllers\SsgController');
         $router->post('ssg/start-build' ,'Mcms\FrontEnd\Http\Controllers\SsgController@startBuild');
 

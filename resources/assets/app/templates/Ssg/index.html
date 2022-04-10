@@ -4,7 +4,7 @@
             <h2 class="md-title">Static Site Generator</h2>
             <div flex=""></div>
 
-            <md-button class="md-fab md-hue-2 md-accent" aria-label="Add"
+            <md-button class="md-fab md-hue-2 md-accent" aria-label="Add" ng-disabled="VM.building"
                        ng-click="VM.build()">
                 <md-icon class="material-icons">build</md-icon>
                 <md-tooltip md-direction="top">
@@ -15,7 +15,9 @@
 
     </md-toolbar>
 
-    <div ng-if="VM.building" class="alert alert-info">Build
+    <div ng-if="VM.building" class="alert alert-info">
+        <md-progress-circular md-mode="indeterminate" ng-if="VM.building"></md-progress-circular>
+        Build
         <strong>#{{VM.currentBuild.id}}</strong>
         started</div>
 
@@ -34,14 +36,20 @@
         <h2 class="md-title">Showing {{VM.items.length}} builds</h2>
 
     </md-toolbar>
+
+    <textarea ng-model="VM.progressOutput" rows="15" ng-if="VM.building" disabled></textarea>
+
     <md-list flex>
         <md-list-item ng-repeat="item in VM.items" ng-click="VM.viewItem(item.id)" class="md-3-line">
             <div class="md-list-item-text" layout="column">
+
+
                 <h3><strong>#{{ item.id }}</strong></h3>
                 <h4>
                     <label class="label label-success" ng-if="item.status == 'completed'">Completed</label>
-                    <label class="label label-info" ng-if="item.status == 'started'">Started</label>
+                    <label class="label label-info" ng-if="['started', 'queued', 'active'].indexOf(item.status) !== -1">Started</label>
                     <label class="label label-error" ng-if="item.status == 'failed'">Failed</label>
+                    <label class="label label-error" ng-if="item.status == 'canceled'">Canceled</label>
               </h4>
                 <p>{{ item.run_at | moment }}</p>
             </div>

@@ -2,8 +2,8 @@
 
 namespace Mcms\FrontEnd\Http\Controllers;
 use Illuminate\Routing\Controller as BaseController;
+use Mcms\FrontEnd\Services\CloudflareSsgService;
 use Mcms\FrontEnd\Services\SsgService;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Redis;
@@ -12,9 +12,18 @@ class SsgController extends BaseController
 {
     protected $service;
     protected $redisKey;
+    protected $provider;
 
     public function __construct(SsgService $service)
     {
+        $providerName = env('SSG_DEFAULT_PROVIDER', 'local');
+
+        switch ($providerName) {
+            case 'cloudflare': $this->provider = new CloudflareSsgService();
+            break;
+            default: $this->provider = new SsgService();
+        }
+
         $this->redisKey = env('APP_NAME') . '_builder';
         $this->service = $service;
         $this->middleware('sse')->only('getDataStream');
@@ -22,23 +31,19 @@ class SsgController extends BaseController
 
     public function index(): \Illuminate\Http\JsonResponse
     {
-        return response()->json($this->service->all());
+        return response()->json($this->provider->all());
+    }
+
+    public function boot(): \Illuminate\Http\JsonResponse
+    {
+        return response()->json([
+            'provider' => $this->provider->id,
+        ]);
     }
 
     public function startBuild()
     {
-        $client = new Client();
-        $model = $this->service->store(auth()->id());
-
-        $client->post(env('SSG_BUILDER_URL'), [
-            'json' => [
-                'token' => $model->token,
-                'id' => env('SSG_ID'),
-                'jobId' => $model->id,
-            ]
-        ]);
-
-        return $model;
+        return response()->json($this->provider->startBuild());
     }
 
     /**
@@ -94,7 +99,12 @@ class SsgController extends BaseController
 
     }
 
-    public function getDataStream(Request $request){
+    public function getDeployment($id)
+    {
+        return response()->json($this->provider->getDeployment($id));
+    }
+
+    public function getDataStream(Request $request, $id){
         $response = new StreamedResponse();
 
         $response->headers->set('Content-Type', 'text/event-stream');
@@ -102,17 +112,14 @@ class SsgController extends BaseController
         $response->headers->set('Connection', 'keep-alive');
         $response->headers->set('X-Accel-Buffering', 'no');
 
-        $response->setCallback(function ()  {
-            $data = Redis::get($this->redisKey);
-            $data = json_decode($data);
-
+        $response->setCallback(function () use ($id)  {
+            $data = $this->provider->getDeploymentUpdates($id);
             if (empty($data)) {
                 $data = [];
             }
 
             $event = 'message';
-            $id = 1;
-            Redis::del($this->redisKey);
+//            Redis::del($this->redisKey);
             echo 'id: ' . $id . "\n";
             echo 'event: ' . $event . "\n";
             echo 'data: ' . json_encode($data) . "\n\n";

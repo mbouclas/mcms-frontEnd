@@ -2,12 +2,16 @@
 
 namespace Mcms\FrontEnd\Services;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Mcms\FrontEnd\Models\SsgBuildHistoryModel;
 
 
 class SsgService
 {
+    public $id = 'local';
+    public $name = 'Local Builder';
     public $cacheKeyName = 'ssg.build';
     protected $model;
 
@@ -60,5 +64,28 @@ class SsgService
         $model = $this->model->where(['id' => $jobId]);
         $model->update($data);
         return $model;
+    }
+
+    public function startBuild()
+    {
+        $client = new Client();
+        $model = $this->store(auth()->id());
+
+        $client->post(env('SSG_BUILDER_URL'), [
+            'json' => [
+                'token' => $model->token,
+                'id' => env('SSG_ID'),
+                'jobId' => $model->id,
+            ]
+        ]);
+
+        return $model;
+    }
+
+    public function getDeploymentUpdates($id)
+    {
+        $data = Redis::get($id);
+
+        return json_decode($data);
     }
 }
